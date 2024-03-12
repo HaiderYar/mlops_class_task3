@@ -1,23 +1,24 @@
-pipline{
+pipeline {
     agent any
-
-    stages{
-        stage("Build"){
-            steps{
-                echo "Building"
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from the SCM
+                git 'https://github.com/HaiderYar/mlops_class_task3.git'
             }
         }
-
-        stage("Test"){
-            steps{
-                echo "Testing"
+        stage('Verify Branch') {
+            steps {
+                script {
+                    def branchName = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                    if (branchName == 'main') {
+                        echo "Push is allowed for the main branch."
+                    } else {
+                        error "Pushes to branches other than main are not allowed."
+                    }
+                }
             }
         }
-
-        stage("Deploy"){
-            steps{
-                echo "Deploying"
-            }
-        }
-    }
+    }
 }
